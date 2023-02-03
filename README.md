@@ -1,27 +1,5 @@
 # Lab-2
 
-## Outline
-  - [Overview](#overview)
-  - [A few SQL statements](#a-few-sql-statements)
-  - [In class mini-lecture](#in-class-mini-lecture)
-  - [The `SELECT` statement](#the-select-statement)
-    - [Creating the table](#creating-the-table)
-    - [Giving it some data](#giving-it-some-data)
-      - [Use `INSERT`](#use-insert)
-      - [Basic form of `SELECT`](#basic-form-of-select)
-      - [Renaming a column](#renaming-a-column)
-      - [Getting fancy with columns](#getting-fancy-with-columns)
-      - [The `WHERE` clause](#the-where-clause)
-      - [Logicals in the `WHERE` clause](#logicals-in-the-where-clause)
-      - [The `LIMIT` clause](#the-limit-clause)
-      - [The keyword `DISTINCT`](#the-keyword-distinct)
-      - [The REAL power:  **JOINS**](#the-real-power--joins)
-      - [The `EXPLAIN` keyword](#the-explain-keyword)
-  - [Put together a small group](#put-together-a-small-group)
-  - [An SQL tutorial](#an-sql-tutorial)
-  - [Checklist of what to do](#checklist-of-what-to-do)
-  - [References](#references)
-
 ## Overview
 
 The goal of this lab is to get you used to working with tables. In particular we are going to spend some
@@ -46,7 +24,7 @@ Below are a few SQL statements and their structure.  Any expression enclosed in 
 	DELETE FROM <table> WHERE <condition>;
 ```
 
-The [references](#references) section contains a link to *exhaustive* information about the 1999 SQL standard (not all of which works with MariaDB).  Also the quotes on `UPDATE` are only needed when the value is a string.
+The [references](#references) section contains a link to *exhaustive* information about the 1999 SQL standard (not all of which works with SQL Server).  Also the quotes on `UPDATE` are only needed when the value is a string.
 
 Here are a few more SQL commands:
 
@@ -66,7 +44,7 @@ has  a `SET` clause and a `WHERE` clause.  This will make a lot more sense after
 
 ## In class mini-lecture
 
-The theoretical basis behind data storage in RDBMS are sets (in the mathematical sense).  For those unfamiliar with the idea (or if you just want a refresher), I'll give a mini-lecture at the whiteboard discussing:
+The theoretical basis behind data storage in RDBMS are sets (in the mathematical sense).
 
 * Mathematical idea of a **set**
 * Some common **set operations**
@@ -95,7 +73,8 @@ Our eventual goal is to make a *point of sales* system, so we are going to start
 
 1. Log in using your username
 2. Be sure that your database is the current one
-3. Create a table named `inventory` with the following fields (read the **full** question before attempting any SQL)
+3. Create a new Schema called Lab02
+4. Within the Lab02 Schema create a table named `inventory` with the following fields (read the **full** question before attempting any SQL)
    * `item` – a string (think `VARCHAR`) that describes the item
    * `unit` – a string that indicates the unit that we'll use to count this `item` in our inventory (gallons, bags, ounces, pieces, etc.)
    * `amount` – an integer indicating how many we have in our inventory (should this ever be negative?)
@@ -104,7 +83,7 @@ Our eventual goal is to make a *point of sales* system, so we are going to start
 I want you to use the following description for the `id` field:
 
 ```
-id INTEGER PRIMARY KEY AUTO_INCREMENT NOT NULL
+id INT IDENTITY(1,1) PRIMARY KEY NOT NULL
 ```
 
 Notice that the format is similar for any field:  `<col name> <col type> <extras>`.  The column definitions (the other name for fields) are separated by commas.
@@ -114,14 +93,14 @@ From the link provided above you should recall that a **PRIMARY KEY** is an impo
 * has a unique value for each row (super key)
 * is no longer a super key if any attribute is dropped
 
-In the column definition I provided above, you have told the DBMS that the column `id` serves as the primary key for the table.  The extra `AUTO_INCREMENT` ensures that this field (see how I've used all 3 of the words?) has a unique value for each row, and `NOT NULL` ensures that there is a value in the field… hence it really is a primary key.  (DBMS allow people to cheat a bit – technically a column can't serve as a PRIMARY KEY if it has a NULL value)
+In the column definition I provided above, you have told the DBMS that the column `id` serves as the primary key for the table.  The extra `IDENTITY(1,1)` ensures that this field (see how I've used all 3 of the words?) has a unique value for each row, and `NOT NULL` ensures that there is a value in the field… hence it really is a primary key.  (DBMS allow people to cheat a bit – technically a column can't serve as a PRIMARY KEY if it has a NULL value)
 
 ### Giving it some data
 
 #### Use `INSERT`
 Now that the table exists, use `INSERT` to add some data:
 
-Insert 5 or 6 items of varying amounts and values into `inventory`.  You'll want at least a few low numbers and at least a few high numbers in the `amount` field.   (we'll use this later).<BR><BR>Add another item and *"accidentally"* give it the same name as something already in the table, but make certain that at least one of the fields differ between the two records.  (The up-arrow is your friend for manual entries like these)
+Insert 5 or 6 items of varying amounts and values into `inventory`.  You'll want at least a few low numbers and at least a few high numbers in the `amount` field.   (we'll use this later).<BR><BR>Add another item and *"accidentally"* give it the same name as something already in the table, but make certain that at least one of the fields differ between the two records.  
 
 #### Basic form of `SELECT`
 The basic form of the `SELECT` command is `SELECT <cols> FROM <table>;`.  Experiment with that.  For example:
@@ -150,32 +129,15 @@ You can rename a column using the `AS <new name>` clause (note the use of quotes
 ```
 
 #### Getting fancy with columns
-SQL has a fairly large collection of functions.  Some are standard (what what's "standard" depends on _which_ version of SQL you are using), but just about everybody has their own collection. Have a look at MariaDB's collection of functions and operators:
-
-   * [An alphabetical list of all functions and operators](https://mariadb.com/kb/en/library/function-and-operator-reference/)
-   * [A list of built-in functions organized by type and kind](https://mariadb.com/kb/en/library/built-in-functions/)
+SQL has a fairly large collection of functions.  Some are standard (what's "standard" depends on _which_ version of SQL you are using), but just about everybody has their own collection. 
 
 Pay particular attention to the comparison operators and how they deal with NULL.  Also notice that some functions show up as SQL keywords (look at BETWEEN).
-
-Here are a few things to keep in mind:
-
-* Ignore the Dynamic Columns functions for now – they're a way for us to get around some of the limitations of relational database and to let us interface with a NOSQL database like Cassandra.  (We might get back to them near the end of the course).
-* For the moment, the functions that are used with GROUP BY will remain mysterious (we'll fix that soon).
-* We're not going to go into the GEOMETRY and GEOGRAPHY functions (but they might make a good group project... hint hint)
-* Skim over the Miscellaneous Functions
-* Ignore anything about user-defined functions, spider functions, and analyze (for now).
-
-NOTE:  hidden in the string functions (to which you WANT to pay attention) are the functions that deal with regular expressions.  This is useful – but not as powerful as some regular expression engines (ask me if you don't know what a regular expression is).  Check out [MariaDB's Regular Expression Overview](https://mariadb.com/kb/en/regular-expressions-overview/) for the details.
-
-It might not be clear from the documentation (unless you look very closely), but things like `&&` and `AND` are synonyms. 
-
-The functions can be used in column lists and can use columns as arguments:
 
 ```
 SELECT left(item,3) AS leftiest FROM inventory;
 ```
 
-You can combine this with the * option to add your column (but be careful, I'm pretty sure that `*` has to come first):
+You can combine this with the * option to add your column:
 
 ```
 SELECT *, left(item,3) AS leftiest FROM inventory;
@@ -187,7 +149,7 @@ You do not, however, have to use columns as arguments:
 SELECT "peanut butter jelly" AS time, item, unit FROM inventory; 
 ```
 
-If you leave out the new column name then the column will be named after the expression:
+If you leave out the new column name then the column will not have a name:
 
 ```
 SELECT left(item,3) AS leftiest FROM inventory; 
@@ -205,13 +167,7 @@ SELECT * FROM inventory WHERE amount < 50;
 Think of the condition as being applied to each row one at a time and only when a TRUE is returned is that row allowed into the output.  This will return all rows that contain an n:
 
 ```
-SELECT * FROM inventory WHERE item REGEXP 'n';
-```
-
-OR
-
-```
-SELECT * FROM inventory WHERE item RLIKE "n";
+SELECT * FROM inventory WHERE item LIKE "%n%";
 ```
 
 Note.  It's not case sensitive.
@@ -219,32 +175,18 @@ Note.  It's not case sensitive.
 If I wanted all rows where item STARTED with n:
 
 ```
-SELECT * FROM inventory WHERE item REGEXP '^n';
-```
-
-OR:
-
-```
 SELECT * FROM inventory WHERE item LIKE "n%";
-```	
-
-Remember this was originally designed for business, so there is a "sort-of" approximate match called `SOUNDS LIKE` which takes the English pronunciation into consideration.
-	
-For example, I have nacho cheese as one of my items, and this query (the results of a select statement) works to find them:
-
-```
-SELECT * FROM inventory WHERE item SOUNDS LIKE "nawch";
-```		
+```			
 
 #### Logicals in the `WHERE` clause
 Although our sample table is still pretty small see if you can do a search for everything whose name contains a particular letter and has an amount less than 50 (refer to the first link above if necessary)
 
-#### The `LIMIT` clause
+#### The `TOP` clause
 
-Add `LIMIT <num>` at the end of a select to control the max number of rows:
+Add `TOP <num>` at the beginning of a select to control the max number of rows:
 
 ```
-SELECT * FROM inventory LIMIT 3;
+SELECT TOP 3 * FROM inventory;
 ```
 
 This is particularly useful when you are first crafting a query because it can be pretty easy to mess up and produce a query that returns thousands of rows.
@@ -273,7 +215,7 @@ After you have made the table **add a few entries**.  Just pick a few things.
 ProTip:  In an `INSERT` you can leave out the initial parenthetical clause that lists the columns if you are adding values for every column.  For example, here is a description of my prices table:
 
 ```
-mysql> describe prices;
+sql> describe prices;
 	+-------+--------------+------+-----+---------+-------+
 	| Field | Type         | Null | Key | Default | Extra |
 	+-------+--------------+------+-----+---------+-------+
@@ -293,7 +235,7 @@ INSERT INTO prices VALUES (1,12.43,"Buy from Ritchie");
 Here's what mine looked like (your mileage may vary):
 
 ```
-	mysql> select * from prices;
+	sql> select * from prices;
 	+-----+--------+------------------+
 	| id  | price  | notes            |
 	+-----+--------+------------------+
@@ -317,7 +259,7 @@ UPDATE prices SET notes="Version A" WHERE id=2;
 So, back to it:
 
 ```
-	mysql> select * from prices;
+	sql> select * from prices;
 	+-----+--------+------------------+
 	| id  | price  | notes            |
 	+-----+--------+------------------+
@@ -328,7 +270,7 @@ So, back to it:
 	+-----+--------+------------------+
 	4 rows in set (0.00 sec)
 			
-	mysql> select * from inventory;
+	sql> select * from inventory;
 	+---------------+---------+--------+----+
 	| item          | unit    | amount | id |
 	+---------------+---------+--------+----+
@@ -481,20 +423,6 @@ There is also (theoretically), an `OUTER JOIN` which, effectively is a combinati
 
 Before continuing **read [this explanation of SQL joins](http://www.codinghorror.com/blog/2007/10/a-visual-explanation-of-sql-joins.html). Be sure to do as many of the examples as you can – in particular create the tables and run the queries.** Remember that mariaDB doesn't do `FULL OUTER JOINS` correctly so you'd have to use something like the techniques in "How to simulate FULL OUTER JOIN in MySQL" mentioned above to get those examples to work. Your output may not always be in the same order either; in general because we think of query results as _sets_ the order isn't guaranteed unless you do something to explicitly specify the desired order. (More about that later.)
 
-#### The `EXPLAIN` keyword
-By putting the keyword `EXPLAIN` (or `DESCRIBE`-- they're synonyms) in front of a query you get back a table that tells you something about how mariaDB is attempting to optimize your query:
-
-```
-EXPLAIN SELECT * FROM inventory;
-EXPLAIN SELECT * FROM prices;
-EXPLAIN SELECT *,"bob" AS yeti FROM prices;
-EXPLAIN SELECT * FROM inventory, prices where inventory.id=prices.id;
-EXPLAIN EXTENDED SELECT * FROM inventory, prices where inventory.id=prices.id;
-EXPLAIN SELECT * FROM prices RIGHT JOIN inventory ON inventory.id=prices.id;
-```
-
-[This page](https://mariadb.com/kb/en/library/explain/) has more information… but we still need some background before filling in all the pieces. One cool thing, though, is that it estimates the size of your result, which can be useful if you've got a query that is generating unexpectedly huge results.
-
 ## An SQL tutorial
 
 Do this tutorial for reinforcement:  http://www.sqlcourse.com/intro.html
@@ -512,7 +440,3 @@ Do this tutorial for reinforcement:  http://www.sqlcourse.com/intro.html
    * There should be at least 4 entries in the table
 * [ ] Do the examples in the [join tutorial](http://www.codinghorror.com/blog/2007/10/a-visual-explanation-of-sql-joins.html)
 * [ ] Do the [sqlcourse tutorial](http://www.sqlcourse.com/intro.html)
-
-## References
-
-* [SQL 99 reference](https://mariadb.com/kb/en/sql-99/)
