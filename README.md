@@ -421,7 +421,7 @@ Of course, every  `LEFT JOIN` has an equivalent `RIGHT JOIN`.
 		
 There is also (theoretically), an `OUTER JOIN` which, effectively is a combination of the `LEFT JOIN` and the `RIGHT JOIN` (in the way you would expect), however, MariaDB doesn't seem to implement it correctly. [Method 2 in "How to Simulate FULL OUTER JOIN in MySQL"](https://www.xaprb.com/blog/2006/05/26/how-to-write-full-outer-join-in-mysql/) does appear to work if you want to explore that.
 
-Before continuing **read [this explanation of SQL joins](http://www.codinghorror.com/blog/2007/10/a-visual-explanation-of-sql-joins.html). Be sure to do as many of the examples as you can – in particular create the tables and run the queries.** Remember that mariaDB doesn't do `FULL OUTER JOINS` correctly so you'd have to use something like the techniques in "How to simulate FULL OUTER JOIN in MySQL" mentioned above to get those examples to work. Your output may not always be in the same order either; in general because we think of query results as _sets_ the order isn't guaranteed unless you do something to explicitly specify the desired order. (More about that later.)
+Before continuing **read [this explanation of SQL joins](https://blog.codinghorror.com/a-visual-explanation-of-sql-joins). Be sure to do as many of the examples as you can – in particular create the tables and run the queries.** Remember that mariaDB doesn't do `FULL OUTER JOINS` correctly so you'd have to use something like the techniques in "How to simulate FULL OUTER JOIN in MySQL" mentioned above to get those examples to work. Your output may not always be in the same order either; in general because we think of query results as _sets_ the order isn't guaranteed unless you do something to explicitly specify the desired order. (More about that later.)
 
 ## An SQL tutorial
 
@@ -438,5 +438,5 @@ Do this tutorial for reinforcement:  http://www.sqlcourse.com/intro.html
    * Fields should be `price`, `notes`, `id`
    * data-types of fields should be as indicated in the lab
    * There should be at least 4 entries in the table
-* [ ] Do the examples in the [join tutorial](http://www.codinghorror.com/blog/2007/10/a-visual-explanation-of-sql-joins.html)
+* [ ] Do the examples in the [join tutorial](https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/)
 * [ ] Do the [sqlcourse tutorial](http://www.sqlcourse.com/intro.html)
